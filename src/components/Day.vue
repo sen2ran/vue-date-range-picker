@@ -2,7 +2,7 @@
   <div>
     <div
       class="datepicker__tooltip"
-      v-if="showTooltip &amp;&amp; this.options.hoveringTooltip"
+      v-if="showTooltip == this.options.hoveringTooltip"
       v-html="tooltipMessageDisplay"
     ></div>
     <div
@@ -125,11 +125,21 @@ export default {
 
     dayClass() {
       if (this.belongsToThisMonth) {
+        //if calendar have one day
+        if (this.options.mode == "single" && !this.isDisabled && this.checkIn) {
+          if (
+            fecha.format(this.checkIn, "YYYYMMDD") ==
+            fecha.format(this.date, "YYYYMMDD")
+          ) {
+            return "datepicker__month-day--first-day-selected";
+          }
+        }
         // If the calendar has a minimum number of nights
         if (
           !this.isDisabled &&
           this.compareDay(this.date, this.checkIn) == 1 &&
-          this.options.minNights > 0
+          this.options.minNights > 0 &&
+          this.options.mode == "range"
         ) {
           if (
             this.compareDay(
@@ -160,7 +170,10 @@ export default {
         }
 
         // If the calendar has allowed ranges
-        if (this.options.allowedRanges.length !== 0) {
+        if (
+          this.options.allowedRanges.length !== 0 &&
+          this.options.mode == "range"
+        ) {
           if (
             !this.isDisabled &&
             this.checkIn !== null &&
@@ -200,7 +213,8 @@ export default {
         if (
           this.checkIn !== null &&
           fecha.format(this.checkIn, "YYYYMMDD") ==
-            fecha.format(this.date, "YYYYMMDD")
+            fecha.format(this.date, "YYYYMMDD") &&
+          this.options.mode == "range"
         ) {
           if (this.options.minNights == 0) {
             return "datepicker__month-day--first-day-selected";
@@ -208,7 +222,7 @@ export default {
             return "datepicker__month-day--disabled datepicker__month-day--first-day-selected";
           }
         }
-        if (this.checkOut !== null) {
+        if (this.checkOut !== null && this.options.mode == "range") {
           if (
             fecha.format(this.checkOut, "YYYYMMDD") ==
             fecha.format(this.date, "YYYYMMDD")
@@ -217,7 +231,11 @@ export default {
           }
         }
         // Only highlight dates that are not disabled
-        if (this.isHighlighted && !this.isDisabled) {
+        if (
+          this.isHighlighted &&
+          !this.isDisabled &&
+          this.options.mode == "range"
+        ) {
           return " datepicker__month-day--selected";
         }
         if (this.isDisabled) {
@@ -297,8 +315,6 @@ export default {
     },
 
     dayClicked(date) {
-      console.log(1);
-
       if (this.isDisabled || !this.isClickable()) {
         return;
       } else {
@@ -333,43 +349,51 @@ export default {
     },
 
     checkIfDisabled() {
-      this.isDisabled =
-        // If this day is equal any of the disabled dates
-        (this.sortedDisabledDates
-          ? this.sortedDisabledDates.some(
-              i => this.compareDay(i, this.date) == 0
-            )
-          : null) ||
-        // Or is before the start date
-        this.compareDay(this.date, this.options.startDate) == -1 ||
-        // Or is after the end date
-        this.compareEndDay() ||
-        // Or is in one of the disabled days of the week
-        this.options.disabledDaysOfWeek.some(
-          i => i == fecha.format(this.date, "dddd")
-        );
-      // Handle checkout enabled
-      if (this.options.enableCheckout) {
-        if (
-          this.compareDay(this.date, this.checkIn) == 1 &&
-          this.compareDay(this.date, this.checkOut) == -1
-        ) {
-          this.isDisabled = false;
+      if (this.options.isOldDayDisable) {
+        this.isDisabled =
+          // If this day is equal any of the disabled dates
+          (this.sortedDisabledDates
+            ? this.sortedDisabledDates.some(
+                i => this.compareDay(i, this.date) == 0
+              )
+            : null) ||
+          // Or is before the start date
+          this.compareDay(this.date, this.options.startDate) == -1 ||
+          // Or is after the end date
+          this.compareEndDay() ||
+          // Or is in one of the disabled days of the week
+          this.options.disabledDaysOfWeek.some(
+            i => i == fecha.format(this.date, "dddd")
+          );
+        // Handle checkout enabled
+        if (this.options.enableCheckout) {
+          if (
+            this.compareDay(this.date, this.checkIn) == 1 &&
+            this.compareDay(this.date, this.checkOut) == -1
+          ) {
+            this.isDisabled = false;
+          }
         }
+      } else {
+        this.isDisabled = false;
       }
     },
 
     checkIfHighlighted() {
-      if (
-        this.checkIn !== null &&
-        this.checkOut !== null &&
-        this.isDisabled == false
-      ) {
-        this.isDateLessOrEquals(this.checkIn, this.date) &&
-        this.isDateLessOrEquals(this.date, this.checkOut)
-          ? (this.isHighlighted = true)
-          : (this.isHighlighted = false);
-      }
+      // if (this.options.isOldDayDisable) {
+        if (
+          this.checkIn !== null &&
+          this.checkOut !== null &&
+          this.isDisabled == false
+        ) {
+          this.isDateLessOrEquals(this.checkIn, this.date) &&
+          this.isDateLessOrEquals(this.date, this.checkOut)
+            ? (this.isHighlighted = true)
+            : (this.isHighlighted = false);
+        }
+      // } else {
+      //   this.isHighlighted = false;
+      // }
     },
 
     createAllowedCheckoutDays(date) {

@@ -17,7 +17,11 @@
       <div class="box">
         <h3>Reset From out side</h3>
         <button @click="resetFn()">Reset</button>
-        <DatePicker :isReset="isReset" />
+        <DatePicker :isOldDayDisable="isOldDayDisable" :isReset="isReset" />
+      </div>
+      <div class="box">
+        <h3>Select Date Range with old Date</h3>
+        <DatePicker :isOldDayDisable="isOldDayDisable" />
       </div>
     </div>
   </div>
@@ -33,6 +37,8 @@ export default {
 
   data() {
     return {
+      isOldDayDisable: false,
+      name: null,
       isReset: null,
       rangeType: "week",
       ptPT: {

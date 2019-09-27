@@ -235,6 +235,14 @@ export default {
     isReset: {
       type: Number
     },
+    mode: {
+      default: "range",
+      type: String
+    },
+    isOldDayDisable: {
+      default: true,
+      type: [Boolean, Function]
+    },
     startingDateValue: {
       default: null,
       type: Date
@@ -381,7 +389,7 @@ export default {
     startingDateValue: {
       immediate: true,
       handler(val) {
-        this.checkIn = val
+        this.checkIn = val;
       }
     },
     endingDateValue: {
@@ -474,6 +482,8 @@ export default {
     },
 
     handleDayClick(event) {
+      console.log(event.nextDisabledDate);
+
       if (this.checkIn == null && this.singleDaySelection == false) {
         this.checkIn = event.date;
       } else if (this.singleDaySelection == true) {
