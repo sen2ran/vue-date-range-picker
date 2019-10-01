@@ -2,14 +2,33 @@
   <div id="app" style="text-align: left; padding: 10vw">
     <div>
       <div class="box">
-        <DatePicker  />
+        <h3>Week</h3>
+        <DatePicker
+          :minNights="7"
+          :allowedRanges="[7,14,21,28,35]"
+          @check-in-changed="checkInChanged"
+          @check-out-changed="checkOutChanged"
+        />
+      </div>
+      <div class="box">
+        <h3>Month</h3>
+        <DatePicker :minNights="30" :allowedRanges="[30,60,90,120,150]" />
+      </div>
+      <div class="box">
+        <h3>Reset From out side</h3>
+        <button @click="resetFn()">Reset</button>
+        <DatePicker :isOldDayDisable="isOldDayDisable" :isReset="isReset" />
+      </div>
+      <div class="box">
+        <h3>Select Date Range with old Date</h3>
+        <DatePicker :isOldDayDisable="isOldDayDisable" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import DatePicker from "@/components/DatePicker/DatePicker.vue";
+import DatePicker from "@/components/DatePicker.vue";
 
 export default {
   components: {
