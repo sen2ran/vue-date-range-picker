@@ -24,6 +24,8 @@
               :getMonth="date.getMonth"
               :multiSelectesDates="MultiSelectesDates"
               :singleDate="SingleDate"
+              :rangeDates="RangeDates"
+              :hoveringDate="hoveringDate"
               @mouseover.native="hoveringDate = date.date"
               @day-clicked="DayClick($event)"
             />
@@ -44,7 +46,7 @@ import Day from "./Day";
 export default {
   props: {
     mode: {
-      default: "Single", // "Single" , Multi , Range
+      default: "Range", // "Single" , Multi , Range
       type: String
     }
   },
@@ -71,7 +73,11 @@ export default {
       monthIndex: null,
       hoveringDate: null,
       MultiSelectesDates: [],
-      SingleDate: null
+      SingleDate: null,
+      RangeDates: {
+        startDate: null,
+        endDate: null
+      }
     };
   },
   components: {
@@ -118,6 +124,19 @@ export default {
       }
       if (this.mode == "Single") {
         this.SingleDatePickerFn(event);
+      }
+      if (this.mode == "Range") {
+        this.RangeDatePickerFn(event);
+      }
+    },
+    RangeDatePickerFn(event) {
+      if (!this.RangeDates.startDate) {
+        this.RangeDates.startDate = event.date;
+      } else if (this.RangeDates.startDate && !this.RangeDates.endDate) {
+        this.RangeDates.endDate = event.date;
+      } else {
+        this.RangeDates.endDate = null;
+        this.RangeDates.startDate = event.date;
       }
     },
     SingleDatePickerFn(event) {
@@ -327,28 +346,28 @@ export default {
   background-color: #012847;
   color: #fff;
 }
-/* .calendar .calendar-date .date-item:focus {
-  background: #dbdbdb;
-  border-color: #dbdbdb;
-  color: white;
+.calendar .calendar-date .date-item:focus {
+  border-color: #012847;
+  background-color: #012847;
+  color: #fff;
   text-decoration: none;
-} */
+}
 .calendar .calendar-date .date-item:hover {
-  background: #dbdbdb;
-  border-color: #dbdbdb;
-  color: #7a7a7a;
+  background: #045fad;
+  border-color: #045fad;
+  color: #a7abad;
   text-decoration: none;
 }
 .calendar .calendar-date .date-item.is-active {
-  background: #d0e1f0;
-  border-color: #d0e1f0;
-  color: #012847;
+  background: #045fad;
+  border-color: #045fad;
+  color: #a7abad;
 }
 
 .calendar .calendar-range .date-item {
-  background: #d0e1f0;
-  border-color: #d0e1f0;
-  color: #012847;
+  background: #045fad;
+  border-color: #045fad;
+  color: #a7abad;
 }
 
 .calendar .calendar-date.is-disabled .date-item,
@@ -371,6 +390,13 @@ export default {
   -webkit-transform: translateY(-50%);
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
+}
+
+.calendar .calendar-range.range-start,
+.calendar .calendar-range.range-end {
+  background: #045fad;
+  border-color: #045fad;
+  color: #a7abad;
 }
 .calendar .calendar-range.range-start::before {
   left: 50%;
