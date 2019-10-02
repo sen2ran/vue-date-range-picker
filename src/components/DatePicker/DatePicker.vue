@@ -14,6 +14,7 @@
           <div class="calendar-body">
             <Day
               v-for="(date,index) in dates"
+              :options="$props"
               :key="index"
               :date="date.date"
               :belongsToThisMonth="date.belongsToThisMonth"
@@ -22,6 +23,7 @@
               :getDate="date.getDate"
               :getMonth="date.getMonth"
               :multiSelectesDates="MultiSelectesDates"
+              :singleDate="SingleDate"
               @mouseover.native="hoveringDate = date.date"
               @day-clicked="DayClick($event)"
             />
@@ -40,6 +42,12 @@ import Right from "./utill/Right";
 import Day from "./Day";
 
 export default {
+  props: {
+    mode: {
+      default: "Single", // "Single" , Multi , Range
+      type: String
+    }
+  },
   data() {
     return {
       days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
@@ -62,14 +70,9 @@ export default {
       dates: [],
       monthIndex: null,
       hoveringDate: null,
-      MultiSelectesDates: []
+      MultiSelectesDates: [],
+      SingleDate: null
     };
-  },
-  props: {
-    mode: {
-      default: "Multi",
-      type: String
-    }
   },
   components: {
     Left,
@@ -111,12 +114,47 @@ export default {
     },
     DayClick(event) {
       if (this.mode == "Multi") {
-        if (!this.MultiSelectesDates.includes(event.date)) {
-          this.MultiSelectesDates.push(event.date);
-        } else {
-          let removeIndex = this.MultiSelectesDates.indexOf(event.date);
-          this.MultiSelectesDates.splice(removeIndex, 1);
+        this.multiDatePickerFn(event);
+      }
+      if (this.mode == "Single") {
+        this.SingleDatePickerFn(event);
+      }
+    },
+    SingleDatePickerFn(event) {
+      this.SingleDate = event.date;
+    },
+    multiDatePickerFn(event) {
+      let MultiSelectesDates = JSON.parse(
+        JSON.stringify(this.MultiSelectesDates)
+      );
+      if (MultiSelectesDates.length > 0) {
+        let isDay = false;
+        let removeIndex = null;
+        for (let l = 0; l < MultiSelectesDates.length; l++) {
+          if (!isDay) {
+            isDay = this.isDay(MultiSelectesDates[l], event.date);
+          }
+          if (isDay) {
+            removeIndex = l;
+            break;
+          }
         }
+        if (isDay) {
+          this.MultiSelectesDates.splice(removeIndex, 1);
+        } else {
+          this.MultiSelectesDates.push(event.date);
+        }
+      } else {
+        this.MultiSelectesDates.push(event.date);
+      }
+    },
+    isDay(day1, day2) {
+      const date1 = fecha.format(new Date(day1), "YYYYMMDD");
+      const date2 = fecha.format(new Date(day2), "YYYYMMDD");
+      if (date1 == date2) {
+        return true;
+      } else {
+        return false;
       }
     },
     createMonth(date) {
@@ -128,7 +166,7 @@ export default {
           belongsToThisMonth:
             this.addDays(firstDay, i).getMonth() === date.getMonth(),
           getDate: Number(this.getDay(this.addDays(firstDay, i))),
-          getMonth: Number(this.getMonth(this.addDays(firstDay, i))),
+          getMonth: Number(this.getMonth(this.addDays(firstDay, i)))
         });
       }
       this.dates = days;

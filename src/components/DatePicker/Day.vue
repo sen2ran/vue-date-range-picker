@@ -12,6 +12,9 @@ export default {
     date: {
       type: Date
     },
+    options: {
+      type: Object
+    },
     belongsToThisMonth: {
       type: Boolean
     },
@@ -29,6 +32,9 @@ export default {
     },
     multiSelectesDates: {
       type: Array
+    },
+    singleDate: {
+      type: Date
     }
   },
   computed: {
@@ -43,12 +49,36 @@ export default {
     },
     dayBtnclass() {
       if (this.belongsToThisMonth) {
-        if (this.multiSelectesDates.length > 0) {
-          let multiSelectesDates = this.multiSelectesDates;
-          if (multiSelectesDates.includes(this.date)) {
+        if (this.options.mode == "Multi") {
+          //Multi
+          if (this.multiSelectesDates.length > 0) {
+            let multiSelectesDates = this.multiSelectesDates;
+            for (let k = 0; k < multiSelectesDates.length; k++) {
+              if (this.compareDay(this.date, multiSelectesDates[k]) == 0) {
+                if (this.isToday) {
+                  return "is-today";
+                } else {
+                  return "is-today";
+                }
+              } else {
+                if (this.isToday) {
+                  return "is-today";
+                }
+              }
+            }
+          } else {
             if (this.isToday) {
               return "is-today";
-            } else {
+            }
+          }
+        }
+        if (this.options.mode == "Single") {
+          //Single
+          if (this.singleDate) {
+            if (this.compareDay(this.date, this.singleDate) == 0) {
+              return "is-today";
+            }
+            if (this.isToday) {
               return "is-today";
             }
           } else {
@@ -56,19 +86,6 @@ export default {
               return "is-today";
             }
           }
-          // for (let k = 0; k < multiSelectesDates.length; k++) {
-          //   if (this.compareDay(this.date, multiSelectesDates[k]) == 0) {
-          //     if (this.isToday) {
-          //       return "is-today";
-          //     } else {
-          //       return "is-today";
-          //     }
-          //   } else {
-          //     if (this.isToday) {
-          //       return "is-today";
-          //     }
-          //   }
-          // }
         }
       } else {
         return null;
