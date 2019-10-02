@@ -45,19 +45,30 @@ export default {
       if (this.belongsToThisMonth) {
         if (this.multiSelectesDates.length > 0) {
           let multiSelectesDates = this.multiSelectesDates;
-          for (let k = 0; k < multiSelectesDates.length; k++) {
-            if (this.compareDay(this.date, multiSelectesDates[k]) == 0) {
-              if (this.isToday) {
-                return "is-today";
-              } else {
-                return "is-today";
-              }
+          if (multiSelectesDates.includes(this.date)) {
+            if (this.isToday) {
+              return "is-today";
             } else {
-              if (this.isToday) {
-                return "is-today";
-              }
+              return "is-today";
+            }
+          } else {
+            if (this.isToday) {
+              return "is-today";
             }
           }
+          // for (let k = 0; k < multiSelectesDates.length; k++) {
+          //   if (this.compareDay(this.date, multiSelectesDates[k]) == 0) {
+          //     if (this.isToday) {
+          //       return "is-today";
+          //     } else {
+          //       return "is-today";
+          //     }
+          //   } else {
+          //     if (this.isToday) {
+          //       return "is-today";
+          //     }
+          //   }
+          // }
         }
       } else {
         return null;

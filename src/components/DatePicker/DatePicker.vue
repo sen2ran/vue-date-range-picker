@@ -129,7 +129,6 @@ export default {
             this.addDays(firstDay, i).getMonth() === date.getMonth(),
           getDate: Number(this.getDay(this.addDays(firstDay, i))),
           getMonth: Number(this.getMonth(this.addDays(firstDay, i))),
-          selected: false
         });
       }
       this.dates = days;
