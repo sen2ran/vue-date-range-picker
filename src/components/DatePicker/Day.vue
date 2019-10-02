@@ -35,6 +35,12 @@ export default {
     },
     singleDate: {
       type: Date
+    },
+    rangeDates: {
+      type: Object
+    },
+    hoveringDate: {
+      type: Date
     }
   },
   computed: {
@@ -87,6 +93,21 @@ export default {
             }
           }
         }
+        if (this.options.mode == "Range") {
+          if (this.rangeDates.startDate && this.rangeDates.endDate) {
+            if (this.compareDay(this.date, this.rangeDates.startDate) == 0) {
+              return "is-active";
+            }
+            if (this.compareDay(this.date, this.rangeDates.endDate) == 0) {
+              return "is-active";
+            }
+          } else if (this.rangeDates.startDate && !this.rangeDates.endDate) {
+          } else {
+            if (this.isToday) {
+              return "is-today";
+            }
+          }
+        }
       } else {
         return null;
       }
@@ -94,6 +115,29 @@ export default {
     dayDivClass() {
       if (this.belongsToThisMonth) {
         //Fn
+        if (this.options.mode == "Range") {
+          if (this.rangeDates.startDate && this.rangeDates.endDate) {
+            if (
+              this.compareDay(this.date, this.rangeDates.endDate) == -1 &&
+              this.compareDay(this.date, this.rangeDates.startDate) == 1
+            ) {
+              return "calendar-range";
+            }
+          } else if (this.rangeDates.startDate && !this.rangeDates.endDate) {
+            console.log("1");
+
+            if (
+              this.compareDay(this.date, this.rangeDates.startDate) == 1 &&
+              this.compareDay(this.date, this.hoveringDate) == -1
+            ) {
+              return "calendar-range";
+            }
+          } else {
+            if (this.isToday) {
+              return "is-today";
+            }
+          }
+        }
       } else {
         return "is-disabled";
       }
