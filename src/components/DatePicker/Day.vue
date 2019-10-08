@@ -44,12 +44,14 @@ export default {
     },
     monthIndex: {
       type: Number
+    },
+    disabledDateFrom: {
+      type: [Date, Boolean]
     }
   },
   data() {
     return {
-      isDisable: false,
-      sortedDisabledDates: []
+      isDisable: false
     };
   },
   watch: {
@@ -141,14 +143,20 @@ export default {
               return "calendar-range";
             }
           } else if (this.rangeDates.startDate && !this.rangeDates.endDate) {
-            //selected Range
+            // selected Range
             if (
               this.compareDay(this.date, this.rangeDates.startDate) == 1 &&
-              this.compareDay(this.date, this.hoveringDate) == -1 
+              this.compareDay(this.date, this.hoveringDate) == -1 &&
+              this.compareDay(this.date, this.disabledDateFrom) != 1
             ) {
-                return "calendar-range";
+              return "calendar-range";
             }
 
+            if (this.disabledDateFrom) {
+              if (this.compareDay(this.date, this.disabledDateFrom) == 1) {
+                return "is-disabled";
+              }
+            }
             //disable Date after cliking the startDate
             if (this.compareDay(this.date, this.rangeDates.startDate) == -1) {
               return "is-disabled";
@@ -170,7 +178,6 @@ export default {
   },
   mounted() {
     this.checkifDateDisable();
-    this.parseDisabledDates();
   },
   methods: {
     dayClicked() {
@@ -182,6 +189,7 @@ export default {
     compareDay(day1, day2) {
       const date1 = fecha.format(new Date(day1), "YYYYMMDD");
       const date2 = fecha.format(new Date(day2), "YYYYMMDD");
+
       if (date1 > date2) {
         return 1;
       } else if (date1 == date2) {
@@ -190,6 +198,7 @@ export default {
         return -1;
       }
     },
+
     checkifDateDisable() {
       if (
         this.ifStartDateFn() ||
@@ -233,15 +242,6 @@ export default {
       } else {
         return false;
       }
-    },
-    parseDisabledDates() {
-      const sortedDates = [];
-      let disabledDates = this.options.disabledDates;
-      for (let l = 0; l < disabledDates.length; l++) {
-        sortedDates[l] = new Date(disabledDates[l]);
-      }
-      sortedDates.sort((a, b) => a - b);
-      this.sortedDisabledDates = sortedDates;
     }
   }
 };

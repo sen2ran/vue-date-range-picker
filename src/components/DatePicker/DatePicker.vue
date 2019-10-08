@@ -28,6 +28,7 @@
               :hoveringDate="hoveringDate"
               :monthIndex="monthIndex"
               @mouseover.native="hoveringDate = date.date"
+              :disabledDateFrom="disabledDateFrom"
               @day-clicked="DayClick($event)"
             />
           </div>
@@ -94,7 +95,9 @@ export default {
       RangeDates: {
         startDate: null,
         endDate: null
-      }
+      },
+      sortedDisabledDates: [],
+      disabledDateFrom: false
     };
   },
   components: {
@@ -108,12 +111,16 @@ export default {
     this.month = this.monthNames[d.getMonth()];
     this.year = d.getFullYear();
     this.createMonth(d);
+    this.parseDisabledDates();
   },
   watch: {
     monthIndex(val) {
       this.month = this.monthNames[val];
       let nextMonth = new Date(this.year, this.monthIndex, 1);
       this.createMonth(nextMonth);
+    },
+    "RangeDates.startDate"() {
+      this.getIndex();
     }
     // hoveringDate(val){
     // }
@@ -184,6 +191,33 @@ export default {
       } else {
         this.MultiSelectesDates.push(event.date);
       }
+    },
+    getIndex() {
+      const sortedDisabledDates = this.sortedDisabledDates;
+      for (var k = 0; k < sortedDisabledDates.length; k++) {
+        const date1 = fecha.format(
+          new Date(this.RangeDates.startDate),
+          "YYYYMMDD"
+        );
+        const date2 = fecha.format(
+          new Date(sortedDisabledDates[k]),
+          "YYYYMMDD"
+        );
+        if (date1 < date2) {
+          console.log(sortedDisabledDates[k]);
+          this.disabledDateFrom = sortedDisabledDates[k];
+          break;
+        }
+      }
+    },
+    parseDisabledDates() {
+      const sortedDates = [];
+      let disabledDates = this.disabledDates;
+      for (let l = 0; l < disabledDates.length; l++) {
+        sortedDates[l] = new Date(disabledDates[l]);
+      }
+      sortedDates.sort((a, b) => a - b);
+      this.sortedDisabledDates = sortedDates;
     },
     isDay(day1, day2) {
       const date1 = fecha.format(new Date(day1), "YYYYMMDD");
