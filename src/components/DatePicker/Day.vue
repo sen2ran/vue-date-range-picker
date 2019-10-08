@@ -41,6 +41,23 @@ export default {
     },
     hoveringDate: {
       type: Date
+    },
+    monthIndex: {
+      type: Number
+    }
+  },
+  data() {
+    return {
+      isDisable: false,
+      sortedDisabledDates: []
+    };
+  },
+  watch: {
+    monthIndex: {
+      handler(val) {
+        this.checkifDateDisable();
+      },
+      immediate: true
     }
   },
   computed: {
@@ -115,7 +132,7 @@ export default {
     dayDivClass() {
       if (this.belongsToThisMonth) {
         //Fn
-        if (this.options.mode == "Range") {
+        if (this.options.mode == "Range" && !this.isDisable) {
           if (this.rangeDates.startDate && this.rangeDates.endDate) {
             if (
               this.compareDay(this.date, this.rangeDates.endDate) == -1 &&
@@ -124,24 +141,36 @@ export default {
               return "calendar-range";
             }
           } else if (this.rangeDates.startDate && !this.rangeDates.endDate) {
-            console.log("1");
-
+            //selected Range
             if (
               this.compareDay(this.date, this.rangeDates.startDate) == 1 &&
-              this.compareDay(this.date, this.hoveringDate) == -1
+              this.compareDay(this.date, this.hoveringDate) == -1 
             ) {
-              return "calendar-range";
+                return "calendar-range";
+            }
+
+            //disable Date after cliking the startDate
+            if (this.compareDay(this.date, this.rangeDates.startDate) == -1) {
+              return "is-disabled";
             }
           } else {
             if (this.isToday) {
               return "is-today";
             }
           }
+        } else {
+          if (this.isDisable) {
+            return "is-disabled";
+          }
         }
       } else {
         return "is-disabled";
       }
     }
+  },
+  mounted() {
+    this.checkifDateDisable();
+    this.parseDisabledDates();
   },
   methods: {
     dayClicked() {
@@ -153,7 +182,6 @@ export default {
     compareDay(day1, day2) {
       const date1 = fecha.format(new Date(day1), "YYYYMMDD");
       const date2 = fecha.format(new Date(day2), "YYYYMMDD");
-
       if (date1 > date2) {
         return 1;
       } else if (date1 == date2) {
@@ -161,6 +189,59 @@ export default {
       } else if (date1 < date2) {
         return -1;
       }
+    },
+    checkifDateDisable() {
+      if (
+        this.ifStartDateFn() ||
+        this.ifEndDateFn() ||
+        this.ifDisabledDatesFn()
+      ) {
+        this.isDisable = true;
+      } else {
+        this.isDisable = false;
+      }
+    },
+    ifEndDateFn() {
+      if (this.options.endDate) {
+        if (this.compareDay(this.date, this.options.endDate) == 1) {
+          return true;
+        }
+      } else {
+        return false;
+      }
+    },
+    ifStartDateFn() {
+      if (this.compareDay(this.date, this.options.startDate) == -1) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    ifDisabledDatesFn() {
+      let disabledDates = this.options.disabledDates;
+      for (let l = 0; l < disabledDates.length; l++) {
+        if (this.isDay(disabledDates[l], this.date)) {
+          return true;
+        }
+      }
+    },
+    isDay(day1, day2) {
+      const date1 = fecha.format(new Date(day1), "YYYYMMDD");
+      const date2 = fecha.format(new Date(day2), "YYYYMMDD");
+      if (date1 == date2) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    parseDisabledDates() {
+      const sortedDates = [];
+      let disabledDates = this.options.disabledDates;
+      for (let l = 0; l < disabledDates.length; l++) {
+        sortedDates[l] = new Date(disabledDates[l]);
+      }
+      sortedDates.sort((a, b) => a - b);
+      this.sortedDisabledDates = sortedDates;
     }
   }
 };
