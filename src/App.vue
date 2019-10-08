@@ -70,7 +70,7 @@
         </div>
       </div>
       <div class="columns">
-        <div class="column"> 
+        <div class="column">
           <DatePicker :mode="selcetedType" :disabledDates="disabledDates" />
         </div>
       </div>
@@ -90,7 +90,7 @@ export default {
     return {
       //example
       types: ["Single", "Multi", "Range"],
-      selcetedType: "Single",
+      selcetedType: "Range",
 
       endDate: new Date(2019, 11, 15),
       startDate: new Date(2019, 9, 3),
@@ -98,7 +98,8 @@ export default {
         new Date(2019, 9, 25),
         new Date(2019, 9, 22),
         new Date(2019, 9, 14),
-        new Date(2019, 9, 24)
+        new Date(2019, 9, 24),
+        new Date(2019, 10, 19)
       ]
     };
   },
