@@ -26,6 +26,7 @@
               :singleDate="SingleDate"
               :rangeDates="RangeDates"
               :hoveringDate="hoveringDate"
+              :monthIndex="monthIndex"
               @mouseover.native="hoveringDate = date.date"
               @day-clicked="DayClick($event)"
             />
@@ -48,6 +49,22 @@ export default {
     mode: {
       default: "Range", // "Single" , Multi , Range
       type: String
+    },
+    startDate: {
+      default: function() {
+        return new Date();
+      },
+      type: [Date, String]
+    },
+    endDate: {
+      default: false,
+      type: [Date, String, Boolean]
+    },
+    disabledDates: {
+      default: function() {
+        return [];
+      },
+      type: Array
     }
   },
   data() {
@@ -143,6 +160,7 @@ export default {
       this.SingleDate = event.date;
     },
     multiDatePickerFn(event) {
+      console.log(event);
       let MultiSelectesDates = JSON.parse(
         JSON.stringify(this.MultiSelectesDates)
       );
@@ -152,14 +170,14 @@ export default {
         for (let l = 0; l < MultiSelectesDates.length; l++) {
           if (!isDay) {
             isDay = this.isDay(MultiSelectesDates[l], event.date);
-          }
-          if (isDay) {
-            removeIndex = l;
-            break;
+            if (isDay) {
+              removeIndex = l;
+              this.MultiSelectesDates.splice(removeIndex, 1);
+              break;
+            }
           }
         }
         if (isDay) {
-          this.MultiSelectesDates.splice(removeIndex, 1);
         } else {
           this.MultiSelectesDates.push(event.date);
         }
