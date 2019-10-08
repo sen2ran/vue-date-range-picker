@@ -27,8 +27,8 @@
               :rangeDates="RangeDates"
               :hoveringDate="hoveringDate"
               :monthIndex="monthIndex"
-              @mouseover.native="hoveringDate = date.date"
               :disabledDateFrom="disabledDateFrom"
+              @mouseover.native="hoveringDate = date.date"
               @day-clicked="DayClick($event)"
             />
           </div>
@@ -167,10 +167,11 @@ export default {
       this.SingleDate = event.date;
     },
     multiDatePickerFn(event) {
-      console.log(event);
+      // console.log(event);
       let MultiSelectesDates = JSON.parse(
         JSON.stringify(this.MultiSelectesDates)
       );
+      console.log(MultiSelectesDates);
       if (MultiSelectesDates.length > 0) {
         let isDay = false;
         let removeIndex = null;
@@ -179,12 +180,14 @@ export default {
             isDay = this.isDay(MultiSelectesDates[l], event.date);
             if (isDay) {
               removeIndex = l;
-              this.MultiSelectesDates.splice(removeIndex, 1);
               break;
             }
           }
         }
+        console.log(removeIndex);
+        
         if (isDay) {
+          this.MultiSelectesDates.splice(removeIndex, 1);
         } else {
           this.MultiSelectesDates.push(event.date);
         }
@@ -398,12 +401,12 @@ export default {
   background-color: #012847;
   color: #fff;
 }
-.calendar .calendar-date .date-item:focus {
+/* .calendar .calendar-date .date-item:focus {
   border-color: #012847;
   background-color: #012847;
   color: #fff;
-  text-decoration: none;
-}
+  text-decoration: none; */
+/* } */
 .calendar .calendar-date .date-item:hover {
   background: #045fad;
   border-color: #045fad;
